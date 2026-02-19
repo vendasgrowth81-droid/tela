@@ -77,14 +77,30 @@ exports.handler = async (event) => {
       json = { success: false, message: 'Resposta inválida da API.' };
     }
 
-    // Reescreve URL da imagem para o proxy local (evita bloqueio por Referer/hotlink)
+    // Busca a imagem server-side e converte para base64 (evita bloqueio por Referer/hotlink)
     if (json.success && json.imagem && typeof json.imagem === 'string') {
       let imgUrl = json.imagem.trim();
       if (imgUrl.startsWith('/')) {
         imgUrl = 'https://rastreamentotributario.online' + imgUrl;
       }
       if (imgUrl.startsWith('http://') || imgUrl.startsWith('https://')) {
-        json.imagem = '/.netlify/functions/imagem?url=' + encodeURIComponent(imgUrl);
+        try {
+          const imgRes = await fetch(imgUrl, {
+            headers: {
+              'Accept': 'image/*',
+              'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+              'Referer': 'https://rastreamentotributario.online/'
+            }
+          });
+          if (imgRes.ok) {
+            const buf = await imgRes.arrayBuffer();
+            const b64 = Buffer.from(buf).toString('base64');
+            const contentType = imgRes.headers.get('content-type') || 'image/jpeg';
+            json.imagem = 'data:' + contentType.split(';')[0] + ';base64,' + b64;
+          }
+        } catch (imgErr) {
+          console.error('Erro ao buscar imagem:', imgErr);
+        }
       }
     }
 
