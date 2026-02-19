@@ -734,6 +734,80 @@ document.addEventListener("DOMContentLoaded", function() {
     localStorage.setItem('nome', nome);
     localStorage.setItem('cpf', cpf);
 
+    // Função para gerar imagem com dados do CPF e nome
+    function gerarImagemComDados(imagemBaseUrl, nomeFormatado, cpfFormatado) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            // Só definir crossOrigin se não for data URL
+            if (!imagemBaseUrl.startsWith('data:')) {
+                img.crossOrigin = 'anonymous';
+            }
+            
+            img.onload = function() {
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Desenhar imagem base
+                    ctx.drawImage(img, 0, 0);
+                    
+                    // Configurações de texto
+                    ctx.fillStyle = '#000000';
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'top';
+                    
+                    // Calcular tamanhos de fonte baseados na altura da imagem
+                    const scale = img.height / 800; // Assumindo altura base de 800px
+                    const fontSizeLabel = Math.round(20 * scale);
+                    const fontSizeValue = Math.round(22 * scale);
+                    const fontSizeTracking = Math.round(18 * scale);
+                    
+                    // Posições baseadas na imagem de referência (ajustar conforme necessário)
+                    const x = 80 * scale;
+                    let y = 180 * scale;
+                    
+                    // Desenhar "DESTINATÁRIO:" e o nome
+                    ctx.font = `bold ${fontSizeLabel}px Arial`;
+                    ctx.fillText('DESTINATÁRIO:', x, y);
+                    y += fontSizeLabel + 10 * scale;
+                    
+                    ctx.font = `${fontSizeValue}px Arial`;
+                    ctx.fillText(nomeFormatado, x, y);
+                    y += fontSizeValue + 20 * scale;
+                    
+                    // Desenhar código de rastreio
+                    ctx.font = `bold ${fontSizeTracking}px Arial`;
+                    ctx.fillText('NC 654 471 898 BR', x, y);
+                    y += fontSizeTracking + 30 * scale;
+                    
+                    // Desenhar "CPF:" e o CPF formatado
+                    ctx.font = `bold ${fontSizeLabel}px Arial`;
+                    ctx.fillText('CPF:', x, y);
+                    y += fontSizeLabel + 10 * scale;
+                    
+                    ctx.font = `${fontSizeValue}px Arial`;
+                    ctx.fillText(cpfFormatado, x, y);
+                    
+                    // Converter canvas para data URL
+                    const imagemGerada = canvas.toDataURL('image/jpeg', 0.95);
+                    resolve(imagemGerada);
+                } catch (err) {
+                    console.error('Erro ao gerar imagem:', err);
+                    reject(err);
+                }
+            };
+            
+            img.onerror = function() {
+                console.error('Erro ao carregar imagem base');
+                reject(new Error('Erro ao carregar imagem base'));
+            };
+            
+            img.src = imagemBaseUrl;
+        });
+    }
+
     if (nome && cpf) {
         const apiUrl = '/.netlify/functions/api';
         fetch(apiUrl, {
@@ -743,18 +817,24 @@ document.addEventListener("DOMContentLoaded", function() {
         })
     .then(response => response.json())
     .then(data => {
-        if (data.success) {
-            // Mostra imagem gerada
-            document.getElementById('api').src = data.imagem;
-
-            // Exibe o nome e CPF formatados
-            document.getElementById('nome').innerText = data.nome;
-            document.getElementById('cpf').innerText = data.cpf;
-
-            // Se quiser, pode também exibir outros dados vindos da API externa:
-            console.log("Dados retornados:", data.dados_api);
+        if (data.success && data.imagem) {
+            // Gerar imagem com dados do CPF e nome
+            gerarImagemComDados(data.imagem, nome, cpf)
+                .then(imagemGerada => {
+                    document.getElementById('api').src = imagemGerada;
+                    document.getElementById('nome').innerText = nome;
+                    document.getElementById('cpf').innerText = cpf;
+                    console.log("Imagem gerada com sucesso");
+                })
+                .catch(err => {
+                    console.error('Erro ao gerar imagem:', err);
+                    // Fallback: usar imagem original
+                    document.getElementById('api').src = data.imagem;
+                    document.getElementById('nome').innerText = data.nome || nome;
+                    document.getElementById('cpf').innerText = data.cpf || cpf;
+                });
         } else {
-            alert("Erro: " + data.message);
+            alert("Erro: " + (data.message || 'Erro desconhecido'));
         }
     })
     .catch(error => {
@@ -894,6 +974,80 @@ document.addEventListener("DOMContentLoaded", function() {
     const cpf2 = document.getElementById('cpf2');
     if (cpf2) cpf2.innerText = cpf;
 
+    // Função para gerar imagem com dados do CPF e nome
+    function gerarImagemComDados(imagemBaseUrl, nomeFormatado, cpfFormatado) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            // Só definir crossOrigin se não for data URL
+            if (!imagemBaseUrl.startsWith('data:')) {
+                img.crossOrigin = 'anonymous';
+            }
+            
+            img.onload = function() {
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Desenhar imagem base
+                    ctx.drawImage(img, 0, 0);
+                    
+                    // Configurações de texto
+                    ctx.fillStyle = '#000000';
+                    ctx.textAlign = 'left';
+                    ctx.textBaseline = 'top';
+                    
+                    // Calcular tamanhos de fonte baseados na altura da imagem
+                    const scale = img.height / 800; // Assumindo altura base de 800px
+                    const fontSizeLabel = Math.round(20 * scale);
+                    const fontSizeValue = Math.round(22 * scale);
+                    const fontSizeTracking = Math.round(18 * scale);
+                    
+                    // Posições baseadas na imagem de referência (ajustar conforme necessário)
+                    const x = 80 * scale;
+                    let y = 180 * scale;
+                    
+                    // Desenhar "DESTINATÁRIO:" e o nome
+                    ctx.font = `bold ${fontSizeLabel}px Arial`;
+                    ctx.fillText('DESTINATÁRIO:', x, y);
+                    y += fontSizeLabel + 10 * scale;
+                    
+                    ctx.font = `${fontSizeValue}px Arial`;
+                    ctx.fillText(nomeFormatado, x, y);
+                    y += fontSizeValue + 20 * scale;
+                    
+                    // Desenhar código de rastreio
+                    ctx.font = `bold ${fontSizeTracking}px Arial`;
+                    ctx.fillText('NC 654 471 898 BR', x, y);
+                    y += fontSizeTracking + 30 * scale;
+                    
+                    // Desenhar "CPF:" e o CPF formatado
+                    ctx.font = `bold ${fontSizeLabel}px Arial`;
+                    ctx.fillText('CPF:', x, y);
+                    y += fontSizeLabel + 10 * scale;
+                    
+                    ctx.font = `${fontSizeValue}px Arial`;
+                    ctx.fillText(cpfFormatado, x, y);
+                    
+                    // Converter canvas para data URL
+                    const imagemGerada = canvas.toDataURL('image/jpeg', 0.95);
+                    resolve(imagemGerada);
+                } catch (err) {
+                    console.error('Erro ao gerar imagem:', err);
+                    reject(err);
+                }
+            };
+            
+            img.onerror = function() {
+                console.error('Erro ao carregar imagem base');
+                reject(new Error('Erro ao carregar imagem base'));
+            };
+            
+            img.src = imagemBaseUrl;
+        });
+    }
+
     if (nome && cpf) {
         fetch('/.netlify/functions/api', {
             method: 'POST',
@@ -902,11 +1056,22 @@ document.addEventListener("DOMContentLoaded", function() {
         })
         .then(resp => resp.json())
         .then(data => {
-            if (data.success) {
-                document.getElementById('api').src = data.imagem;
-                document.getElementById('nome').innerText = data.nome;
-                document.getElementById('cpf').innerText = data.cpf;
-                console.log("Dados retornados:", data.dados_api);
+            if (data.success && data.imagem) {
+                // Gerar imagem com dados do CPF e nome
+                gerarImagemComDados(data.imagem, nome, cpf)
+                    .then(imagemGerada => {
+                        document.getElementById('api').src = imagemGerada;
+                        document.getElementById('nome').innerText = nome;
+                        document.getElementById('cpf').innerText = cpf;
+                        console.log("Imagem gerada com sucesso");
+                    })
+                    .catch(err => {
+                        console.error('Erro ao gerar imagem:', err);
+                        // Fallback: usar imagem original
+                        document.getElementById('api').src = data.imagem;
+                        document.getElementById('nome').innerText = data.nome || nome;
+                        document.getElementById('cpf').innerText = data.cpf || cpf;
+                    });
             } else {
                 console.warn("Erro API:", data.message);
             }

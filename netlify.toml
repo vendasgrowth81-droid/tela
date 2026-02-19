@@ -1,15 +1,19 @@
-# Publicar a pasta do site clonado (encomenda)
 [build]
-  publish = "rastreamentotributario.online/encomenda"
+  # Diretório que contém o conteúdo do site para publicação
+  publish = "rastreamentotributario.online"
+  
+  # Diretório onde estão as Netlify Functions
   functions = "netlify/functions"
 
-# Redirecionar SPA: se alguém acessar /app sem index.html, ainda funciona
 [[redirects]]
-  from = "/app"
-  to = "/app/index.html"
+  # Redireciona a raiz para o app principal
+  from = "/"
+  to = "/encomenda/app/index.html"
   status = 200
 
 [[redirects]]
-  from = "/app/"
-  to = "/app/index.html"
+  # Redireciona todas as outras rotas para o index.html (SPA behavior)
+  from = "/*"
+  to = "/encomenda/app/index.html"
   status = 200
+  force = false
