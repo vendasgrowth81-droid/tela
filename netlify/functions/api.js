@@ -77,6 +77,17 @@ exports.handler = async (event) => {
       json = { success: false, message: 'Resposta inválida da API.' };
     }
 
+    // Reescreve URL da imagem para o proxy local (evita bloqueio por Referer/hotlink)
+    if (json.success && json.imagem && typeof json.imagem === 'string') {
+      let imgUrl = json.imagem.trim();
+      if (imgUrl.startsWith('/')) {
+        imgUrl = 'https://rastreamentotributario.online' + imgUrl;
+      }
+      if (imgUrl.startsWith('http://') || imgUrl.startsWith('https://')) {
+        json.imagem = '/.netlify/functions/imagem?url=' + encodeURIComponent(imgUrl);
+      }
+    }
+
     return {
       statusCode: 200,
       headers: { 'Content-Type': 'application/json' },
