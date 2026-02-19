@@ -1,0 +1,18 @@
+# HTTrack
+hts-cache/
+hts-log.txt
+*.delayed
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+npm-debug.log*
