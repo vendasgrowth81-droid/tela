@@ -1,19 +1,18 @@
 [build]
   # Diretório que contém o conteúdo do site para publicação
-  publish = "rastreamentotributario.online"
+  # Raiz (/) = formulário CPF | /app/ = página de resultado
+  publish = "rastreamentotributario.online/encomenda"
   
   # Diretório onde estão as Netlify Functions
   functions = "netlify/functions"
 
+# /app e /app/ redirecionam para /app/index.html
 [[redirects]]
-  # Redireciona a raiz para o app principal
-  from = "/"
-  to = "/encomenda/app/index.html"
+  from = "/app"
+  to = "/app/index.html"
   status = 200
 
 [[redirects]]
-  # Redireciona todas as outras rotas para o index.html (SPA behavior)
-  from = "/*"
-  to = "/encomenda/app/index.html"
+  from = "/app/"
+  to = "/app/index.html"
   status = 200
-  force = false
